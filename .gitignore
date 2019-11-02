@@ -1,3 +1,4 @@
 /Venv/
 /.idea/
 **/__pycache__/
+.spyproject/
