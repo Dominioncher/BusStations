@@ -45,7 +45,6 @@ for route in routes:
         if direct:
             continue
         distances.append(get_dist(check))
-    break
 
 db.drop_collection('checkpoints_distances')
 db.create_collection('checkpoints_distances')
