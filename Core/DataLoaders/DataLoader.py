@@ -4,19 +4,27 @@ import requests
 
 
 def get_routes():
-    return requests.get('https://api.tgt72.ru/api/v5/route/').json()
+    routes = requests.get('https://api.tgt72.ru/api/v5/route/').json()
+    routes = routes['objects']
+    for route in routes:
+        checkpoints = get_route_checkpoints(route['id'])
+        del route['checkpoints_ids']
+        route['direct_ids'] = checkpoints[0]
+        route['reverse_ids'] = checkpoints[1]
+    return routes
 
 
 def get_checkpoints():
-    return requests.get('https://api.tgt72.ru/api/v5/checkpoint/').json()
+    return requests.get('https://api.tgt72.ru/api/v5/checkpoint/').json()['objects']
 
 
 def get_road_works():
-    return requests.get('https://api.tgt72.ru/api/v5/roadworks/').json()
+    return requests.get('https://api.tgt72.ru/api/v5/roadworks/').json()['objects']
 
 
-# Если запустить в консоли питона, можно поглядеть на данные
-if __name__ == '__main__':
-    works = get_road_works()
-    checkpoints = get_checkpoints()
-    routes = get_routes()
+def get_route_checkpoints(route_id):
+    checkpoints = requests.get(f'https://api.tgt72.ru/api/v5/routecheckpoint/?route_id={route_id}').json()['objects']
+    direct_ids = [x['checkpoint_id'] for x in checkpoints if x['forward']]
+    reverse_ids = [x['checkpoint_id'] for x in checkpoints if not x['forward']]
+    return direct_ids, reverse_ids
+
