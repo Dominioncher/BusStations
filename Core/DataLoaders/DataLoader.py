@@ -1,7 +1,5 @@
-import json
-
 import requests
-
+from Core.DataLoaders.Maps import distance_finder
 
 def get_routes():
     routes = requests.get('https://api.tgt72.ru/api/v5/route/').json()
@@ -28,3 +26,14 @@ def get_route_checkpoints(route_id):
     reverse_ids = [x['checkpoint_id'] for x in checkpoints if not x['forward']]
     return direct_ids, reverse_ids
 
+
+def get_dist(pair):
+    dist = dict()
+    first = pair[0]
+    second = pair[1]
+    dist['checkpoint_id_1'] = first['id']
+    dist['checkpoint_id_2'] = second['id']
+    distance = distance_finder(first['lat'], first['lon'], second['lat'], second['lon'])
+    dist['distance'] = distance['dist']
+    dist['time'] = distance['time']
+    return dist
