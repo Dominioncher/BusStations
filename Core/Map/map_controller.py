@@ -1,8 +1,7 @@
 from Core.DataLoaders.DataLoader import get_checkpoints
-from pygeoplot import api
-
+from gmplot import gmplot
 
 if __name__ == '__main__':
-    geo_map = api.Map()
-    imikn = api.GeoPoint(57.158820, 65.522632)
-    geo_map.add_placemark(imikn)
+    gmap = gmplot.GoogleMapPlotter(30.3164945,
+                                   78.03219179999999, 13)
+    gmap.draw('test.html')
