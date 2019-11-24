@@ -3,3 +3,4 @@
 **/__pycache__/
 .spyproject/
 /BusStations.egg-info/
+*.html
