@@ -1,3 +1,5 @@
+networkx
+flask
 pymongo
 certifi
 chardet

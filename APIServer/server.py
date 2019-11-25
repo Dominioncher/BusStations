@@ -1,7 +1,6 @@
-import json
-
 import flask
-import Core.DataLoaders.DataLoader as DL
+from Core.DB.MongoController import db
+from bson.json_util import dumps
 
 PORT = 5000
 
@@ -10,14 +9,17 @@ app = flask.Flask(__name__)
 
 @app.route('/checkpoints', methods=['GET'])
 def get_checkpoints():
-    checkpoints = DL.get_checkpoints()[:20]
-    response_json = json.dumps(checkpoints)
+    checkpoints = list(db['checkpoints'].find())
 
     resp = flask.Response(status=200)
-    resp.data = response_json
+    resp.data = dumps(checkpoints)
     resp.content_type = "application/json"
-
     return resp
+
+
+@app.route('/', methods=['POST', 'GET'])
+def get_map_html():
+    return flask.render_template('map.html')
 
 
 app.run(port=PORT)
