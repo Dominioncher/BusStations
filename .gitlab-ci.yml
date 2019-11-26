@@ -1,16 +1,10 @@
 image: python:3.6-stretch
 
 stages:
-  - test
   - production
   
 before_script:
     - pip install -r requirements.txt
-    
-test:
-  stage: test
-  script:
-    - gunicorn app:app
     
 production:
     type: deploy
