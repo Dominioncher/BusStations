@@ -17,5 +17,3 @@ def get_checkpoints():
 @app.route('/', methods=['POST', 'GET'])
 def get_map_html():
     return flask.render_template('map.html')
-
-app.run(debug=True, host='0.0.0.0')
