@@ -1,12 +1,8 @@
 import flask
-import os
 from Core.DB.MongoController import db
 from bson.json_util import dumps
 
-PORT =  int(os.environ.get("PORT", 5000))
-
 app = flask.Flask(__name__)
-
 
 @app.route('/checkpoints', methods=['GET'])
 def get_checkpoints():
@@ -22,5 +18,6 @@ def get_checkpoints():
 def get_map_html():
     return flask.render_template('map.html')
 
-
-app.run(port=PORT)
+if __name__ == '__main__':
+    # Threaded option to enable multiple instances for multiple user access support
+    app.run(threaded=True, port=5000)
