@@ -18,6 +18,4 @@ def get_checkpoints():
 def get_map_html():
     return flask.render_template('map.html')
 
-if __name__ == '__main__':
-    # Threaded option to enable multiple instances for multiple user access support
-    app.run(threaded=True, port=5000)
+app.run(debug=True, host='0.0.0.0')
