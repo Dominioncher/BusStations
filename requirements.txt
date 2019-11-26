@@ -7,3 +7,4 @@ idna
 requests
 urllib3
 dnspython
+gunicorn
