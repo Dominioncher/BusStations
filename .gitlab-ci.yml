@@ -2,6 +2,7 @@ image: python:3.6-stretch
 
 stages:
   - test
+  - production
   
 before_script:
     - pip install -r requirements.txt
