@@ -6,3 +6,4 @@ chardet
 idna
 requests
 urllib3
+dnspython
