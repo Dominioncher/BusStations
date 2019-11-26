@@ -2,7 +2,7 @@ import flask
 from Core.DB.MongoController import db
 from bson.json_util import dumps
 
-PORT = 5000
+PORT =  int(os.environ.get("PORT", 5000))
 
 app = flask.Flask(__name__)
 
