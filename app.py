@@ -1,4 +1,4 @@
-form APIServer.server import app
+from APIServer.server import app
 
 if __name__ == '__main__':
     app.run()
