@@ -24,7 +24,7 @@ function init() {
 
     // Запрос к нашей api для получения остановок
     const Http = new XMLHttpRequest();
-    const url='http://127.0.0.1:5000/checkpoints';
+    const url='http://localhost/checkpoints';
     Http.onreadystatechange = (e) => {
         if (Http.status == 200)
         {
