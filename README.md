@@ -6,6 +6,8 @@
 
 Heroku: https://bus-station.herokuapp.com
 
+Kubernetes: http://34.70.209.167/
+
 Кушинр.А:
 1. Создание каркаса проекта
 2. Объединение данных и запись в базу
