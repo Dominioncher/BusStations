@@ -11,3 +11,9 @@ spec:
     metadata:
       labels:
         app: hello-kubernetes
+    spec:
+      containers:
+      - name: hello-kubernetes
+        image: gcr.io/{{ secrets.GKE_PROJECT }}/gke-test:{{ github.sha }}
+        ports:
+        - containerPort: 8080
