@@ -9,4 +9,5 @@ jobs:
   deploy:
     steps:
       - name: Deploy
+        runs-on: ubuntu-latest
         uses: ./.github/actions/deploy
