@@ -1,22 +1,2 @@
-apiVersion: apps/v1beta2
-kind: Deployment
-metadata:
-  name: flask-app-tutorial
-  labels:
-    name: flask-app-tutorial
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      name: flask-app-tutorial
-  template:
-    metadata:
-      name: flask-app-tutorial
-      labels:
-        name: flask-app-tutorial
-    spec:
-      containers:
-        - name: flask-app-tutorial
-          image: gcr.io/${{ secrets.GKE_PROJECT }}/gke-test
-          ports:
-            - containerPort: 8080
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
