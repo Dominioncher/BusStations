@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-kubernetes
+  name: gke-test
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: hello-kubernetes
+      app: gke-test
   template:
     metadata:
       labels:
-        app: hello-kubernetes
+        app: gke-test
     spec:
       containers:
       - name: hello-kubernetes
