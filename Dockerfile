@@ -1,6 +1,10 @@
 FROM python:3
-COPY . /app
-WORKDIR /app 
-RUN pip install -r requirements.txt
-ENTRYPOINT ['python']
-CMD ['app.py']
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD [ "gunicorn"  , "app:app" ]
