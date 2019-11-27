@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: hello-kubernetes
-        image: gcr.io/fit-api-256018/gke-test@sha256:60c970c5b9aff06d27c6206e9ea71a702d0f37ad8723ba12f21fdab2bc54bdfd
+        image: gcr.io/fit-api-256018/gke-test
         ports:
         - containerPort: 8080
