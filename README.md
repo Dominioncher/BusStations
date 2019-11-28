@@ -6,7 +6,10 @@
 
 Heroku: https://bus-station.herokuapp.com
 
-Kubernetes: http://34.70.209.167/
+Production окружение: http://104.197.28.13
+
+Dev тестовое окружение : http://34.70.209.167
+
 
 Кушинр.А:
 1. Создание каркаса проекта
