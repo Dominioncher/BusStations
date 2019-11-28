@@ -8,7 +8,7 @@
 #
 # 3. Change the values for the GKE_ZONE, GKE_CLUSTER and IMAGE environment variables (below).
 
-name: Deploy develop to GKE
+name: Deploy pre-release (release and hotfixes) to GKE
 
 on:
   pull_request:
@@ -28,7 +28,7 @@ env:
 
 jobs:
   deploy:
-    name: Deploy develop to GKE
+    name: Deploy pre-release (release and hotfixes) to GKE
     runs-on: ubuntu-latest
     steps:
 
