@@ -7,3 +7,13 @@ spec:
   selector:
     matchLabels:
       app: bus-stations
+  template:
+    metadata:
+      labels:
+        app: bus-stations
+    spec:
+      containers:
+      - name: bus-stations
+        image: gcr.io/fit-api-256018/gke-test
+        ports:
+        - containerPort: 5000
