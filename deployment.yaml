@@ -1,13 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bus-stations-production
+  name: bus-stations
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: bus-stations-production
-  template:
-    metadata:
-      labels:
-        app: bus-stations-production
+      app: bus-stations
