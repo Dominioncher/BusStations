@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bus-stations-pre-release
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bus-stations-pre-release
+  template:
+    metadata:
+      labels:
+        app: bus-stations-pre-release
+    spec:
+      containers:
+      - name: bus-stations-pre-release
+        image: gcr.io/fit-api-256018/bus-stations-pre-release
+        ports:
+        - containerPort: 5000
