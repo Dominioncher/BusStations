@@ -8,7 +8,7 @@
 #
 # 3. Change the values for the GKE_ZONE, GKE_CLUSTER and IMAGE environment variables (below).
 
-name: Build and Deploy to GKE
+name: Build and Deploy production to GKE
 
 on:
   push:
@@ -22,10 +22,10 @@ env:
   GITHUB_SHA: ${{ github.sha }}
   GKE_ZONE: us-central1-a
   GKE_CLUSTER: standard-cluster-1
-  IMAGE: gke-test
+  IMAGE: bus-stations-production
 
 jobs:
-  setup-build-publish-deploy:
+  deploy-production:
     name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
     steps:
@@ -70,5 +70,5 @@ jobs:
         gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
         ./kustomize edit set image gcr.io/$GKE_PROJECT/$IMAGE:${GITHUB_SHA}
         ./kustomize build . | kubectl apply -f -
-        kubectl rollout status deployment/gke-test
+        kubectl rollout status deployment/$IMAGE
         kubectl get services -o wide
