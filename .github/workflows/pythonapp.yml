@@ -1,10 +1,10 @@
-name: Python application
+name: Python build
 
 on: [push]
 
 jobs:
   build:
-
+    name: Python build
     runs-on: ubuntu-latest
 
     steps:
