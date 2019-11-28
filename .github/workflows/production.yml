@@ -8,7 +8,7 @@
 #
 # 3. Change the values for the GKE_ZONE, GKE_CLUSTER and IMAGE environment variables (below).
 
-name: Build and Deploy production to GKE
+name: Deploy production to GKE
 
 on:
   push:
@@ -27,8 +27,8 @@ env:
   DEPLOY_DIR: Deploy/Production
 
 jobs:
-  deploy-production:
-    name: Setup, Build, Publish, and Deploy
+  deploy:
+    name: Deploy production to GKE
     runs-on: ubuntu-latest
     steps:
 
