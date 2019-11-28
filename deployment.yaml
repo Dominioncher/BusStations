@@ -11,9 +11,3 @@ spec:
     metadata:
       labels:
         app: bus-stations-production
-    spec:
-      containers:
-      - name: bus-stations-production
-        image: gcr.io/fit-api-256018/bus-stations
-        ports:
-        - containerPort: 5000
