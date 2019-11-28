@@ -22,7 +22,7 @@ env:
   GITHUB_SHA: ${{ github.sha }}
   GKE_ZONE: us-central1-a
   GKE_CLUSTER: standard-cluster-1
-  IMAGE: bus-stations-production
+  IMAGE: bus-stations
 
 jobs:
   deploy-production:
