@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bus-stations-production
+  name: bus-stations
 spec:
   type: LoadBalancer
   ports:
   - port: 80
     targetPort: 5000
   selector:
-    app: bus-stations-production
+    app: bus-stations
