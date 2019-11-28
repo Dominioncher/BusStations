@@ -13,7 +13,7 @@ spec:
         app: bus-stations-production
     spec:
       containers:
-      - name: hello-kubernetes
-        image: gcr.io/fit-api-256018/gke-test
+      - name: bus-stations-production
+        image: gcr.io/fit-api-256018/bus-stations
         ports:
         - containerPort: 5000
