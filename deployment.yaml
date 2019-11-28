@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bus-stations
+  name: bus-stations-production
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: bus-stations
+      app: bus-stations-production
   template:
     metadata:
       labels:
-        app: bus-stations
+        app: bus-stations-production
     spec:
       containers:
-      - name: bus-stations
-        image: gcr.io/fit-api-256018/gke-test
+      - name: bus-stations-production
+        image: gcr.io/fit-api-256018/bus-stations-production
         ports:
         - containerPort: 5000

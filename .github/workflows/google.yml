@@ -22,7 +22,8 @@ env:
   GITHUB_SHA: ${{ github.sha }}
   GKE_ZONE: us-central1-a
   GKE_CLUSTER: standard-cluster-1
-  IMAGE: bus-stations
+  IMAGE: bus-stations-production
+  APP_NAME: bus-stations-production
 
 jobs:
   deploy-production:
@@ -70,5 +71,5 @@ jobs:
         gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
         ./kustomize edit set image gcr.io/$GKE_PROJECT/$IMAGE:${GITHUB_SHA}
         ./kustomize build . | kubectl apply -f -
-        kubectl rollout status deployment/$IMAGE
+        kubectl rollout status deployment/$APP_NAME
         kubectl get services -o wide
