@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: gke-test
+  name: bus-stations
 spec:
   type: LoadBalancer
   ports:
   - port: 80
     targetPort: 5000
   selector:
-    app: gke-test
+    app: bus-stations
