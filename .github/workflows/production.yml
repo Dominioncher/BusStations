@@ -1,4 +1,4 @@
-# This workflow will build a docker container, publish it to Google Container Registry, and deploy it to GKE.
+# This workflow will build a docker container, publish it to Google Container Registry, and Deploy it to GKE.
 #
 # To configure this workflow:
 #
@@ -8,7 +8,7 @@
 #
 # 3. Change the values for the GKE_ZONE, GKE_CLUSTER and IMAGE environment variables (below).
 
-name: Build and Deploy production to GKE
+name: Deploy production to GKE
 
 on:
   push:
@@ -23,10 +23,12 @@ env:
   GKE_ZONE: us-central1-a
   GKE_CLUSTER: standard-cluster-1
   IMAGE: bus-stations-production
+  APP_NAME: bus-stations-production
+  DEPLOY_DIR: Deploy/Production
 
 jobs:
-  deploy-production:
-    name: Setup, Build, Publish, and Deploy
+  deploy:
+    name: Deploy production to GKE
     runs-on: ubuntu-latest
     steps:
 
@@ -61,14 +63,16 @@ jobs:
     # Set up kustomize
     - name: Set up Kustomize
       run: |
+        cd $DEPLOY_DIR
         curl -o kustomize --location https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
         chmod u+x ./kustomize
 
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
+        cd $DEPLOY_DIR
         gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
         ./kustomize edit set image gcr.io/$GKE_PROJECT/$IMAGE:${GITHUB_SHA}
         ./kustomize build . | kubectl apply -f -
-        kubectl rollout status deployment/$IMAGE
+        kubectl rollout status deployment/$APP_NAME
         kubectl get services -o wide
