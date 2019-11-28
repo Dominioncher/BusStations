@@ -13,7 +13,7 @@ spec:
         app: bus-stations
     spec:
       containers:
-      - name:
-        image:
+      - name: bus-stations
+        image: bus-stations
         ports:
         - containerPort: 5000
