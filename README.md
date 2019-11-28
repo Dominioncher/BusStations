@@ -8,7 +8,9 @@ Heroku: https://bus-station.herokuapp.com
 
 Production окружение: http://104.197.28.13
 
-Dev тестовое окружение : http://34.70.209.167
+Pre-release окружение: http://104.155.169.12
+
+Dev окружение : http://34.70.209.167
 
 
 Кушинр.А:
