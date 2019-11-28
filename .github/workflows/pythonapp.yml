@@ -1,5 +1,7 @@
 name: Python build
 
+on: [push]
+
 jobs:
   build:
     name: Python build
