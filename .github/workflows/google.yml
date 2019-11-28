@@ -1,4 +1,4 @@
-# This workflow will build a docker container, publish it to Google Container Registry, and deploy it to GKE.
+# This workflow will build a docker container, publish it to Google Container Registry, and Deploy it to GKE.
 #
 # To configure this workflow:
 #
@@ -69,7 +69,7 @@ jobs:
     - name: Deploy
       run: |
         gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
-        ./kustomize edit set image gcr.io/$GKE_PROJECT/$IMAGE:${GITHUB_SHA}
-        ./kustomize build . | kubectl apply -f -
+        ./Deploy/kustomize edit set image gcr.io/$GKE_PROJECT/$IMAGE:${GITHUB_SHA}
+        ./Deploy/kustomize build . | kubectl apply -f -
         kubectl rollout status deployment/$APP_NAME
         kubectl get services -o wide
