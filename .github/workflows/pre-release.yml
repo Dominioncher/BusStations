@@ -8,12 +8,12 @@
 #
 # 3. Change the values for the GKE_ZONE, GKE_CLUSTER and IMAGE environment variables (below).
 
-name: Deploy develop to GKE
+name: Deploy pre-release (release and hotfixes) to GKE
 
 on:
-  push:
+  pull_request:
     branches:
-    - develop
+    - master
 
 # Environment variables available to all jobs and steps in this workflow
 env:
@@ -22,13 +22,13 @@ env:
   GITHUB_SHA: ${{ github.sha }}
   GKE_ZONE: us-central1-a
   GKE_CLUSTER: standard-cluster-1
-  IMAGE: bus-stations-dev
-  APP_NAME: bus-stations-dev
-  DEPLOY_DIR: Deploy/Develop
+  IMAGE: bus-stations-pre-release
+  APP_NAME: bus-stations-pre-release
+  DEPLOY_DIR: Deploy/Pre-release
 
 jobs:
   deploy:
-    name: Deploy develop to GKE
+    name: Deploy pre-release (release and hotfixes) to GKE
     runs-on: ubuntu-latest
     steps:
 
