@@ -33,7 +33,6 @@ if __name__ == '__main__':
             if x != len(stops_1_30) - 1:
                 if row.checkpoint_id_1 == stops_1_30[x] and row.checkpoint_id_2 == stops_1_30[x + 1]:
                     distances_1_30.append(row.distance)  # лист с растояниями между маршрутами в одну сторону
-                    print(x)
                     x = x + 1
 
     distances_2_30 = list()
@@ -43,5 +42,4 @@ if __name__ == '__main__':
             if x != len(stops_2_30) - 1:
                 if row.checkpoint_id_1 == stops_2_30[x] and row.checkpoint_id_2 == stops_2_30[x + 1]:
                     distances_2_30.append(row.distance)  # лист с растояниями между маршрутами в обратную сторону
-                    print(x)
                     x = x + 1
