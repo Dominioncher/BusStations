@@ -8,6 +8,3 @@ requests
 urllib3
 dnspython
 gunicorn
-Cython
-numpy
-pandas
