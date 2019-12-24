@@ -22,6 +22,12 @@ function init() {
     objectManager.clusters.options.set('preset', 'islands#blueClusterIcons');
     myMap.geoObjects.add(objectManager);
 
+    // Узнаем по клику координаты (должны узнавать по идее)
+    myMap.events.add('click', function (e) {
+        var coords = e.get('coords');
+        console.log(coords[0].toPrecision(4), coords[1].toPrecision(4))
+    });
+
     // Запрос к нашей api для получения остановок
     const Http = new XMLHttpRequest();
     const url = '/checkpoints';

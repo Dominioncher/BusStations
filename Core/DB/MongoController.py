@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-import pandas as pd
 
 connection = MongoClient(
     "mongodb+srv://BusStation:BusStation@busstations-fcpis.mongodb.net/test?retryWrites=true&w=majority")

@@ -1,7 +1,6 @@
 import networkx as nx
 from Core.DB.MongoController import db
 from Core.DataLoaders.DataLoader import get_dist
-import pandas as pd
 
 
 class BusGraph:
@@ -54,6 +53,10 @@ class BusGraph:
 
         self.graph = graph
 
+        # import matplotlib.pyplot as plt
+        # nx.draw(graph)
+        # plt.show() # проверял граф
+
         x = 1  # остановочка
 
     # TODO Пересчет оптимального маршрута но основе остановок которые надо оптимизировать
@@ -90,3 +93,15 @@ class BusGraph:
             self.graph.add_edge(id, node, distance=distance)
         self.modified_checkpoints.append(id)
         return id
+
+    def get_optimised_route(self, node_a: list, node_b: list, nodes: list):
+        distances = list()
+        for n in nodes:
+            d = list()
+            d['a_x'] = get_dist(node_a, n)
+            d['x_b'] = d + get_dist(n, node_b)
+            d['dist'] = d['a_x'] + d['x_b']
+            d['x'] = n
+            distances.append(d)
+        best_node = d['dist'].index(min(d['dist']))
+        x = 0
