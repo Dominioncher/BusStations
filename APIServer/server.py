@@ -4,6 +4,7 @@ from bson.json_util import dumps
 
 app = flask.Flask(__name__)
 
+
 @app.route('/checkpoints', methods=['GET'])
 def get_checkpoints():
     checkpoints = list(db['checkpoints'].find())

@@ -1,7 +1,8 @@
 from pymongo import MongoClient
 import pandas as pd
 
-connection = MongoClient("mongodb+srv://BusStation:BusStation@busstations-fcpis.mongodb.net/test?retryWrites=true&w=majority")
+connection = MongoClient(
+    "mongodb+srv://BusStation:BusStation@busstations-fcpis.mongodb.net/test?retryWrites=true&w=majority")
 db = connection['BusStation']
 db_routes = db["routes"]
 db_checkpoints = db["checkpoints"]
@@ -18,7 +19,7 @@ if __name__ == '__main__':
 
     # Достаем все остановки по 30ому маршруту
     query = {}
-    query["routes_ids"] = 959 # id 30ого маршрута 959
+    query["routes_ids"] = 959  # id 30ого маршрута 959
     c_1_30 = list()
     cursor = db_checkpoints.find(query)
     for doc in cursor:
@@ -30,8 +31,8 @@ if __name__ == '__main__':
     for index in stops_1_30:
         for y, row in checkpoints_distances.iterrows():
             if x != len(stops_1_30) - 1:
-                if row.checkpoint_id_1 == stops_1_30[x] and row.checkpoint_id_2 == stops_1_30[x+1]:
-                    distances_1_30.append(row.distance) # лист с растояниями между маршрутами в одну сторону
+                if row.checkpoint_id_1 == stops_1_30[x] and row.checkpoint_id_2 == stops_1_30[x + 1]:
+                    distances_1_30.append(row.distance)  # лист с растояниями между маршрутами в одну сторону
                     print(x)
                     x = x + 1
 
@@ -40,7 +41,7 @@ if __name__ == '__main__':
     for index in stops_2_30:
         for y, row in checkpoints_distances.iterrows():
             if x != len(stops_2_30) - 1:
-                if row.checkpoint_id_1 == stops_2_30[x] and row.checkpoint_id_2 == stops_2_30[x+1]:
-                    distances_2_30.append(row.distance) # лист с растояниями между маршрутами в обратную сторону
+                if row.checkpoint_id_1 == stops_2_30[x] and row.checkpoint_id_2 == stops_2_30[x + 1]:
+                    distances_2_30.append(row.distance)  # лист с растояниями между маршрутами в обратную сторону
                     print(x)
                     x = x + 1

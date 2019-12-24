@@ -1,6 +1,7 @@
 import requests
 from Core.DataLoaders.Maps import distance_finder
 
+
 def get_routes():
     routes = requests.get('https://api.tgt72.ru/api/v5/route/').json()
     routes = routes['objects']

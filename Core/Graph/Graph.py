@@ -12,7 +12,9 @@ class BusGraph:
 
     # Загрузка данных из базы в граф
     def load_data(self):
-        checkpoints = list(db['checkpoints'].find())
+        query = {}
+        query["routes_ids"] = 959
+        checkpoints = list(db['checkpoints'].find(query))
         distanses = list(db['checkpoints_distances'].find())
 
         graph = nx.Graph()
