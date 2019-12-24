@@ -7,7 +7,9 @@ app = flask.Flask(__name__)
 
 @app.route('/checkpoints', methods=['GET'])
 def get_checkpoints():
-    checkpoints = list(db['checkpoints'].find())
+    query = {}
+    query["routes_ids"] = 959  # 30ый маршрут
+    checkpoints = list(db['checkpoints'].find(query))
 
     resp = flask.Response(status=200)
     resp.data = dumps(checkpoints)
