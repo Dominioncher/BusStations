@@ -25,7 +25,7 @@ function init() {
     // Узнаем по клику координаты (должны узнавать по идее)
     myMap.events.add('click', function (e) {
         var coords = e.get('coords');
-        console.log(coords[0].toPrecision(4), coords[1].toPrecision(4))
+        console.log('lat=',coords[0].toPrecision(7),',lon=', coords[1].toPrecision(7),',name=1');
     });
 
     // Запрос к нашей api для получения остановок

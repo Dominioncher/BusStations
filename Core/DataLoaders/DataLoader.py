@@ -37,4 +37,4 @@ def get_dist(pair):
     distance = distance_finder(first['lat'], first['lon'], second['lat'], second['lon'])
     dist['distance'] = distance['dist']
     dist['time'] = distance['time']
-    return dist
+    return distance['dist']

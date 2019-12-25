@@ -97,11 +97,12 @@ class BusGraph:
     def get_optimised_route(self, node_a: list, node_b: list, nodes: list):
         distances = list()
         for n in nodes:
-            d = list()
-            d['a_x'] = get_dist(node_a, n)
-            d['x_b'] = d + get_dist(n, node_b)
+            d = dict()
+            d['a_x'] = get_dist((node_a, n))
+            d['x_b'] = get_dist((n, node_b))
             d['dist'] = d['a_x'] + d['x_b']
             d['x'] = n
             distances.append(d)
-        best_node = d['dist'].index(min(d['dist']))
+        best_node = min(distances, key=lambda x: x['dist'])
+        bad_nodes = [i for i in nodes if not (i['id'] == best_node['x']['id'])]  # ноды которые надо удалить
         x = 0
