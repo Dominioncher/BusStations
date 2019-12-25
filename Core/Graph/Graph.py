@@ -71,11 +71,19 @@ class BusGraph:
             neighbors += list(self.graph.neighbors(node))
         self.neighbors = list(set(neighbors))
 
-    # Удалить остановку
+    # Удалить остановку по id
     def remove_checkpoint(self, node: int):
         if node not in self.modified_checkpoints:
             return False
         self.graph.remove_node(node)
+        return True
+
+    # Удалить остановки
+    def remove_checkpoints(self, nodes: list):
+        for node in nodes:
+            if node['id'] not in self.modified_checkpoints:
+                return False
+            self.graph.remove_node(node['id'])
         return True
 
     # Добавить остановку
@@ -92,17 +100,30 @@ class BusGraph:
             distance = get_dist((checkpoint, self.graph.nodes[node]['checkpoint']))
             self.graph.add_edge(id, node, distance=distance)
         self.modified_checkpoints.append(id)
-        return id
+        # return id
+        return checkpoint
 
     def get_optimised_route(self, node_a: list, node_b: list, nodes: list):
-        distances = list()
-        for n in nodes:
-            d = dict()
-            d['a_x'] = get_dist((node_a, n))
-            d['x_b'] = get_dist((n, node_b))
-            d['dist'] = d['a_x'] + d['x_b']
-            d['x'] = n
-            distances.append(d)
-        best_node = min(distances, key=lambda x: x['dist'])
-        bad_nodes = [i for i in nodes if not (i['id'] == best_node['x']['id'])]  # ноды которые надо удалить
-        x = 0
+        all_nodes = list()
+        all_nodes.append(node_a)
+        all_nodes = all_nodes + nodes
+        all_nodes.append(node_b)
+        e = list()
+        for id1, a in enumerate(all_nodes):
+            for id2, b in enumerate(all_nodes):
+                if id2 <= id1:
+                    continue
+                e.append((a['id'], b['id'], get_dist((a, b))))
+        G = nx.Graph()
+        G.add_weighted_edges_from(e)
+        short = nx.dijkstra_path(G, node_a['id'], node_b['id'])
+        bad_nodes = list()
+        for x in all_nodes:
+            b = False
+            for y in short:
+                if x['id'] == y:
+                    b = True
+                    continue
+            if not b:
+                bad_nodes.append(x)
+        return bad_nodes
