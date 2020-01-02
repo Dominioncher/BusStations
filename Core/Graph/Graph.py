@@ -9,6 +9,7 @@ class BusGraph:
         self.graph = nx.Graph()
         self.neighbors = list()
         self.modified_checkpoints = list()
+        self.direct = None
 
     # Загрузка данных из базы в граф
     def load_data(self):
@@ -18,6 +19,7 @@ class BusGraph:
         query = {"name": '30'}  # 30ый маршрут
         routes = list(db['routes'].find(query))  # 30ый маршрут
         stops_1_30 = routes[0]['direct_ids']  # все остановки по 30ому маршруту в одну сторону
+        self.direct = stops_1_30[0]
         stops_2_30 = routes[0]['reverse_ids']  # все остановки по 30ому маршруту в обратную сторону
         stops_all_30 = list(set(stops_1_30) | set(stops_2_30))  # все остановки по 30ому маршруту
 
@@ -100,7 +102,6 @@ class BusGraph:
             distance = get_dist((checkpoint, self.graph.nodes[node]['checkpoint']))
             self.graph.add_edge(id, node, distance=distance)
         self.modified_checkpoints.append(id)
-        # return id
         return checkpoint
 
     def get_optimised_route(self, node_a: list, node_b: list, nodes: list):
@@ -127,3 +128,11 @@ class BusGraph:
             if not b:
                 bad_nodes.append(x)
         return bad_nodes
+
+
+    def get_ordered_checkpoints(self):
+        nodes = list(nx.dfs_preorder_nodes(self.graph, self.direct))
+        checkpoints = []
+        for node in nodes:
+            checkpoints.append(self.graph.nodes[node]['checkpoint'])
+        return checkpoints

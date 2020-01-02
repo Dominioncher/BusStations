@@ -1,13 +1,14 @@
 ymaps.ready(init);
 
-var myMap;
-var objectManager;
+let myMap;
+let objectManager;
 
 function init() {
     createMap();
     clickEvent();
-    loadStations();
     addButtons();
+    load();
+    loadStations();
 }
 
 
@@ -24,7 +25,7 @@ function createMap() {
         // Чтобы метки начали кластеризоваться, выставляем опцию.
         clusterize: true,
         // ObjectManager принимает те же опции, что и кластеризатор.
-        gridSize: 100,
+        gridSize: 10,
         clusterDisableClickZoom: true
     });
 
@@ -38,12 +39,11 @@ function createMap() {
 // Узнаем по клику координаты
 function clickEvent() {
     myMap.events.add('click', function (e) {
-        var coords = e.get('coords');
+        const coords = e.get('coords');
         console.log('lat=',coords[0].toPrecision(7),',lon=', coords[1].toPrecision(7),',name=1');
         if (addMode){
             addNewStation(coords);
             console.log('Добавили точку');
-            loadStations()
         }
     });
 
@@ -51,18 +51,34 @@ function clickEvent() {
 
 // Ручное добавление новой остановки
 function addNewStation(coords) {
-    var Http = new XMLHttpRequest();
+    let Http = new XMLHttpRequest();
+    Http.onload = (e) => {
+        if (Http.status === 200) {
+            let value = JSON.parse(Http.responseText);
+            value = AddNewCheckpoint(value)
+            myMap.geoObjects.add(value)
+        }
+    };
     Http.open('GET', `/addCheckpoint?lat=${coords[0]}&lon=${coords[1]}`);
+    Http.send('');
+}
+
+// Инициализация графа
+function load() {
+    const Http = new XMLHttpRequest();
+    Http.open('GET', '/loadData', false);
     Http.send('');
 }
 
 // Запрос к нашей api для получения остановок
 function loadStations() {
-    var Http = new XMLHttpRequest();
-    Http.onreadystatechange = (e) => {
+    const Http = new XMLHttpRequest();
+    Http.onload = (e) => {
         if (Http.status === 200) {
-            var values = JSON.parse(Http.responseText);
-            var features = [];
+
+            console.log('load stations');
+            let values = JSON.parse(Http.responseText);
+            const features = [];
             values.forEach(x => features.push(AddCheckpoint(x)));
             values = {
                 type: 'FeatureCollection',
@@ -70,11 +86,20 @@ function loadStations() {
             };
             objectManager.removeAll();
             objectManager.add(values);
-            //addBusLine(features)
+            addBusLine(features)
         }
     };
     Http.open('GET', '/checkpoints');
     Http.send('');
+}
+
+// Добавить новую остановку
+function AddNewCheckpoint(value) {
+    return new ymaps.Placemark([value.lat, value.lon], {
+        balloonContent: value.name + '<br>' + value.description,
+    }, {
+        preset: 'islands#greenDotIcon'
+    });
 }
 
 // Добавить метку остановки на карту
@@ -87,53 +112,43 @@ function AddCheckpoint(value) {
             coordinates: [value.lat, value.lon]
         },
         properties: {
-            balloonContentHeader: value.name + '<br>'
-                + value.description + '<br>' +
-                ''
+            balloonContentHeader: value.name + '<br>' + value.description
         }
     }
 }
 
 // Соединяем остановки
 function addBusLine(features) {
-    var dots = [];
+    let dots = [];
+    console.log('lines');
     features.forEach(x => dots.push(x.geometry.coordinates));
-    var myPolyline = new ymaps.Polyline(dots, {
-        // Описываем свойства геообъекта.
-        // Содержимое балуна.
-        balloonContent: "Ломаная линия"
+    var multiRoute = new ymaps.multiRouter.MultiRoute({
+        // Описание опорных точек мультимаршрута.
+        referencePoints: dots,
     }, {
-        // Задаем опции геообъекта.
-        // Отключаем кнопку закрытия балуна.
-        balloonCloseButton: false,
-        // Цвет линии.
-        strokeColor: "#000000",
-        // Ширина линии.
-        strokeWidth: 4,
-        // Коэффициент прозрачности.
-        strokeOpacity: 0.5
+        wayPointVisible: false
     });
-    myMap.geoObjects.add(myPolyline)
+    myMap.geoObjects.add(multiRoute)
 }
 
 // Текуший режим карты
-var editMode = false;
+let editMode = false;
 var addMode = false;
-var removeMode = false;
+let removeMode = false;
 
 // Добавление кнопок редактировать, добавить, удалить
 function addButtons() {
-    var button1 = new ymaps.control.Button("Редактировать");
+    const button1 = new ymaps.control.Button("Редактировать");
     button1.events.add(['press'], function (sender) {
        editMode= addMode = removeMode = false;
        editMode = !sender.originalEvent.target.isSelected();
     });
-    var button2 = new ymaps.control.Button("Добавить");
+    const button2 = new ymaps.control.Button("Добавить");
     button2.events.add(['press'], function (sender) {
         editMode= addMode = removeMode = false;
         addMode = !sender.originalEvent.target.isSelected();
     });
-    var button3 = new ymaps.control.Button("Удалить");
+    const button3 = new ymaps.control.Button("Удалить");
     button3.events.add(['press'], function (sender) {
         editMode= addMode = removeMode = false;
         removeMode = !sender.originalEvent.target.isSelected();
