@@ -5,21 +5,37 @@ let objectManager;
 
 function init() {
     createMap();
-    clickEvent();
-    addButtons();
-    load();
+    onMapClick();
+    createMapButtons();
+    loadGraph();
     loadStations();
 }
 
+// Добавленые остановки
+let addedPlacemarks = []
+let multiRoute;
+
+// Кнопки
+let button1;
+let button2;
+let button3;
+let button4;
+
+// Текуший режим карты
+let editMode = false;
+let addMode = false;
+let removeMode = false;
 
 // Создаем карту.
 function createMap() {
     myMap = new ymaps.Map("map", {
         center: [57.151293, 65.537817],
-        zoom: 15
+        zoom: 15,
+        controls: []
     }, {
         searchControlProvider: 'yandex#search'
     });
+    myMap.events.add('click', onMapClick);
 
     objectManager = new ymaps.ObjectManager({
         // Чтобы метки начали кластеризоваться, выставляем опцию.
@@ -33,77 +49,63 @@ function createMap() {
     // обратимся к дочерним коллекциям ObjectManager.
     objectManager.objects.options.set('preset', 'islands#blueDotIcon');
     objectManager.clusters.options.set('preset', 'islands#blueClusterIcons');
+    objectManager.objects.events.add(['click'], onCheckpointClick);
     myMap.geoObjects.add(objectManager);
 }
+// Сохдать кнопоки редактировать, добавить, удалить
+function createMapButtons() {
+    button1 = createButton("Редактировать");
+    button1.events.add(['press'], function (e) {
+        editMode= addMode = removeMode = false;
+        editMode = !button1.isSelected();
+        button3.deselect()
+        button2.deselect()
+    });
+    button2 = createButton("Добавить");
+    button2.events.add(['press'], function (e) {
+        editMode= addMode = removeMode = false;
+        addMode = !button2.isSelected();
+        button3.deselect()
+        button1.deselect()
+    });
+    button3 = createButton("Удалить");
+    button3.events.add(['press'], function (e) {
+        editMode= addMode = removeMode = false;
+        removeMode = !button3.isSelected();
+        button1.deselect()
+        button2.deselect()
+    });
+    button4 = createButton("Оптимизировать", false);
+    button4.events.add(['press'], onOptimizeClick);
 
-// Узнаем по клику координаты
-function clickEvent() {
-    myMap.events.add('click', function (e) {
-        const coords = e.get('coords');
-        console.log('lat=',coords[0].toPrecision(7),',lon=', coords[1].toPrecision(7),',name=1');
-        if (addMode){
-            addNewStation(coords);
-            console.log('Добавили точку');
+    myMap.controls.add(button1, {float: 'right'});
+    myMap.controls.add(button2, {float: 'right'});
+    myMap.controls.add(button3, {float: 'right'});
+    myMap.controls.add(button4, {float: 'right'});
+}
+// Создать кастомную кнопку
+function createButton(title, select = true) {
+    return new ymaps.control.Button({
+        data: {
+            title: title,
+            content: title
+        },
+        options: {
+            maxWidth: 150,
+            selectOnClick: select
         }
     });
-
 }
-
-// Ручное добавление новой остановки
-function addNewStation(coords) {
-    let Http = new XMLHttpRequest();
-    Http.onload = (e) => {
-        if (Http.status === 200) {
-            let value = JSON.parse(Http.responseText);
-            value = AddNewCheckpoint(value)
-            myMap.geoObjects.add(value)
-        }
-    };
-    Http.open('GET', `/addCheckpoint?lat=${coords[0]}&lon=${coords[1]}`);
-    Http.send('');
-}
-
-// Инициализация графа
-function load() {
-    const Http = new XMLHttpRequest();
-    Http.open('GET', '/loadData', false);
-    Http.send('');
-}
-
-// Запрос к нашей api для получения остановок
-function loadStations() {
-    const Http = new XMLHttpRequest();
-    Http.onload = (e) => {
-        if (Http.status === 200) {
-
-            console.log('load stations');
-            let values = JSON.parse(Http.responseText);
-            const features = [];
-            values.forEach(x => features.push(AddCheckpoint(x)));
-            values = {
-                type: 'FeatureCollection',
-                features: features
-            };
-            objectManager.removeAll();
-            objectManager.add(values);
-            addBusLine(features)
-        }
-    };
-    Http.open('GET', '/checkpoints');
-    Http.send('');
-}
-
-// Добавить новую остановку
-function AddNewCheckpoint(value) {
+// Создать новую остановку
+function createPlacemark(value) {
     return new ymaps.Placemark([value.lat, value.lon], {
         balloonContent: value.name + '<br>' + value.description,
     }, {
         preset: 'islands#greenDotIcon'
     });
 }
-
-// Добавить метку остановки на карту
-function AddCheckpoint(value) {
+// Сохдать метку остановки в кластере
+function createPointsCluster(value) {
     return {
         type: "Feature",
         id: value.id,
@@ -117,12 +119,38 @@ function AddCheckpoint(value) {
     }
 }
 
+// Инициализация графа
+function loadGraph() {
+    const Http = new XMLHttpRequest();
+    Http.open('GET', '/loadData', false);
+    Http.send('');
+}
+// Запрос к нашей api для получения остановок
+function loadStations() {
+    objectManager.removeAll();
+    myMap.geoObjects.remove(multiRoute);
+    const Http = new XMLHttpRequest();
+    Http.onload = (e) => {
+        if (Http.status === 200) {
+            let values = JSON.parse(Http.responseText);
+            const features = [];
+            values.forEach(x => features.push(createPointsCluster(x)));
+            values = {
+                type: 'FeatureCollection',
+                features: features
+            };
+            objectManager.add(values);
+            addBusLine(features)
+        }
+    };
+    Http.open('GET', '/checkpoints');
+    Http.send('');
+}
 // Соединяем остановки
 function addBusLine(features) {
     let dots = [];
-    console.log('lines');
     features.forEach(x => dots.push(x.geometry.coordinates));
-    var multiRoute = new ymaps.multiRouter.MultiRoute({
+    multiRoute = new ymaps.multiRouter.MultiRoute({
         // Описание опорных точек мультимаршрута.
         referencePoints: dots,
     }, {
@@ -131,30 +159,72 @@ function addBusLine(features) {
     myMap.geoObjects.add(multiRoute)
 }
 
-// Текуший режим карты
-let editMode = false;
-var addMode = false;
-let removeMode = false;
+// Клик на остановку
+function onCheckpointClick(e) {
+    let objectId = e.get('objectId');
+    if (editMode) {
+        let Http = new XMLHttpRequest();
+        Http.onload = (e) => {
+            if (Http.status === 204) {
+                objectManager.objects.setObjectOptions(objectId, {
+                    preset: 'islands#yellowIcon'
+                });
+            }
+        };
+        Http.open('GET', `/modifyCheckpoints?id=${objectId}`);
+        Http.send('');
+    }
 
-// Добавление кнопок редактировать, добавить, удалить
-function addButtons() {
-    const button1 = new ymaps.control.Button("Редактировать");
-    button1.events.add(['press'], function (sender) {
-       editMode= addMode = removeMode = false;
-       editMode = !sender.originalEvent.target.isSelected();
-    });
-    const button2 = new ymaps.control.Button("Добавить");
-    button2.events.add(['press'], function (sender) {
-        editMode= addMode = removeMode = false;
-        addMode = !sender.originalEvent.target.isSelected();
-    });
-    const button3 = new ymaps.control.Button("Удалить");
-    button3.events.add(['press'], function (sender) {
-        editMode= addMode = removeMode = false;
-        removeMode = !sender.originalEvent.target.isSelected();
-    });
+    if (removeMode) {
+        let Http = new XMLHttpRequest();
+        Http.onload = (e) => {
+            if (Http.status === 200) {
+                let value = JSON.parse(Http.responseText);
+                if (!value){
+                    return
+                }
 
-    myMap.controls.add(button1, {float: 'right'});
-    myMap.controls.add(button2, {float: 'right'});
-    myMap.controls.add(button3, {float: 'right'});
+                objectManager.remove([objectId])
+            }
+        };
+        Http.open('GET', `/removeCheckpoint?id=${objectId}`);
+        Http.send('');
+    }
+}
+// Клик по карте
+function onMapClick(e) {
+    if (!addMode) {
+        return
+    }
+
+    const coords = e.get('coords');
+    let Http = new XMLHttpRequest();
+    Http.onload = (e) => {
+        if (Http.status === 200) {
+            let value = JSON.parse(Http.responseText);
+            value = createPlacemark(value);
+            addedPlacemarks.push(value);
+            myMap.geoObjects.add(value)
+        }
+    };
+    Http.open('GET', `/addCheckpoint?lat=${coords[0]}&lon=${coords[1]}`);
+    Http.send('');
+}
+// Оптимизация маршрутов
+function onOptimizeClick(e) {
+    let Http = new XMLHttpRequest();
+    Http.onload = (e) => {
+        if (Http.status === 204) {
+            removeAllPlacemarks();
+            loadStations()
+        }
+    };
+    Http.open('GET', `/optimizeCheckpoint`);
+    Http.send('');
+}
+
+// Удалить все добавленные метки
+function removeAllPlacemarks() {
+    addedPlacemarks.forEach(x=>myMap.geoObjects.remove(x));
+    addedPlacemarks = []
 }

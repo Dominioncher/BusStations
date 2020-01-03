@@ -12,7 +12,7 @@ def load_data():
     global graph
     graph = Bus.BusGraph()
     graph.load_data()
-    return ('', 204)
+    return '', 204
 
 
 @app.route('/checkpoints', methods=['GET'])
@@ -32,3 +32,26 @@ def add_checkpoint():
     lon = request.args.get('lon')
     added = graph.add_checkpoint('Новая остановка', lat, lon)
     return dumps(added)
+
+
+@app.route('/modifyCheckpoints', methods=['GET'])
+def modify_checkpoints():
+    nodes = list()
+    node = int(request.args.get('id'))
+    nodes.append(node)
+    graph.modify_checkpoints(nodes)
+    return '', 204
+
+
+@app.route('/removeCheckpoint', methods=['GET'])
+def remove_checkpoints():
+    node = int(request.args.get('id'))
+    removed = graph.remove_checkpoint(node)
+    return dumps(removed)
+
+
+@app.route('/optimizeCheckpoint', methods=['GET'])
+def optimize_checkpoints():
+    graph.modified_checkpoints.clear()
+    graph.optimize()
+    return '', 204

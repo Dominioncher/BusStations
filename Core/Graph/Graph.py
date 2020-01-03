@@ -13,14 +13,14 @@ class BusGraph:
 
     # Загрузка данных из базы в граф
     def load_data(self):
-        query = {"routes_ids": 959}  # 30ый маршрут
-        checkpoints = list(db['checkpoints'].find(query))  # все остановки по 30ому маршруту
-        distanses = list(db['checkpoints_distances'].find())  # все дистанции
-        query = {"name": '30'}  # 30ый маршрут
+        query = {"name": '14'}  # 30ый маршрут
         routes = list(db['routes'].find(query))  # 30ый маршрут
         stops_1_30 = routes[0]['direct_ids']  # все остановки по 30ому маршруту в одну сторону
-        self.direct = stops_1_30[0]
         stops_2_30 = routes[0]['reverse_ids']  # все остановки по 30ому маршруту в обратную сторону
+        query = {"routes_ids": routes[0]['id']}
+        checkpoints = list(db['checkpoints'].find(query))  # все остановки по 30ому маршруту
+        distanses = list(db['checkpoints_distances'].find())  # все дистанции
+        self.direct = stops_1_30[0]
         stops_all_30 = list(set(stops_1_30) | set(stops_2_30))  # все остановки по 30ому маршруту
 
         distances_1_30 = list()
@@ -49,9 +49,9 @@ class BusGraph:
             graph.add_edge(stops_1_30[x], stops_1_30[x + 1], distance=dist)
             x = x + 1
         x = 0
-        for dist in distances_2_30:
-            graph.add_edge(stops_2_30[x], stops_2_30[x + 1], distance=dist)
-            x = x + 1
+        # for dist in distances_2_30:
+        #     graph.add_edge(stops_2_30[x], stops_2_30[x + 1], distance=dist)
+        #     x = x + 1
 
         self.graph = graph
 
@@ -67,25 +67,20 @@ class BusGraph:
 
     # Модификация остановок
     def modify_checkpoints(self, nodes: list):
-        self.modified_checkpoints = nodes
+        self.modified_checkpoints += nodes
+        self.modified_checkpoints = list(set(self.modified_checkpoints))
         neighbors = list()
-        for node in nodes:
+        for node in self.modified_checkpoints:
             neighbors += list(self.graph.neighbors(node))
         self.neighbors = list(set(neighbors))
+        self.neighbors = list([x for x in self.neighbors if x not in self.modified_checkpoints])
 
     # Удалить остановку по id
     def remove_checkpoint(self, node: int):
         if node not in self.modified_checkpoints:
             return False
         self.graph.remove_node(node)
-        return True
-
-    # Удалить остановки
-    def remove_checkpoints(self, nodes: list):
-        for node in nodes:
-            if node['id'] not in self.modified_checkpoints:
-                return False
-            self.graph.remove_node(node['id'])
+        self.modified_checkpoints.remove(node)
         return True
 
     # Добавить остановку
@@ -128,7 +123,6 @@ class BusGraph:
             if not b:
                 bad_nodes.append(x)
         return bad_nodes
-
 
     def get_ordered_checkpoints(self):
         nodes = list(nx.dfs_preorder_nodes(self.graph, self.direct))
