@@ -48,22 +48,46 @@ class BusGraph:
         for dist in distances_1_30:
             graph.add_edge(stops_1_30[x], stops_1_30[x + 1], distance=dist)
             x = x + 1
-        x = 0
-        # for dist in distances_2_30:
-        #     graph.add_edge(stops_2_30[x], stops_2_30[x + 1], distance=dist)
-        #     x = x + 1
 
         self.graph = graph
 
-        # import matplotlib.pyplot as plt
-        # nx.draw(graph)
-        # plt.show() # проверял граф
-
-        x = 1  # остановочка
-
-    # TODO Пересчет оптимального маршрута но основе остановок которые надо оптимизировать
+    # Пересчет оптимального маршрута но основе остановок которые надо оптимизировать
     def optimize(self):
-        gg = self.neighbors
+        for index, a in enumerate(self.modified_checkpoints):
+            if self.graph.has_edge(a, self.neighbors[0]):
+                self.graph.remove_edge(a, self.neighbors[0])
+            if self.graph.has_edge(a, self.neighbors[1]):
+                self.graph.remove_edge(a, self.neighbors[1])
+
+        e = list()
+        for index1, a in enumerate(self.modified_checkpoints):
+            for index2, b in enumerate(self.modified_checkpoints):
+                if index2 <= index1:
+                    continue
+                dist1 = get_dist((self.graph.nodes[a]['checkpoint'], self.graph.nodes[b]['checkpoint']))
+                dist2 = get_dist((self.graph.nodes[b]['checkpoint'], self.graph.nodes[a]['checkpoint']))
+                e.append((a, b, min(dist1, dist2)))
+
+        for index, a in enumerate(self.modified_checkpoints):
+            dist1 = get_dist((self.graph.nodes[a]['checkpoint'], self.graph.nodes[self.neighbors[0]]['checkpoint']))
+            dist2 = get_dist((self.graph.nodes[self.neighbors[0]]['checkpoint'], self.graph.nodes[a]['checkpoint']))
+            e.append((a, self.neighbors[0],
+                      min(dist1, dist2)))
+            dist1 = get_dist((self.graph.nodes[a]['checkpoint'], self.graph.nodes[self.neighbors[1]]['checkpoint']))
+            dist2 = get_dist((self.graph.nodes[self.neighbors[1]]['checkpoint'], self.graph.nodes[a]['checkpoint']))
+            e.append((a, self.neighbors[1],
+                      min(dist1, dist2)))
+        G = nx.Graph()
+        G.add_weighted_edges_from(e)
+        short = nx.dijkstra_path(G, self.neighbors[0], self.neighbors[1])
+        length = len(short)
+        for index1, edge in enumerate(short):
+            for index2 in e:
+                if index1 == length - 1:
+                    break
+                if index2[0] == short[index1] and index2[1] == short[index1 + 1] or index2[1] == short[index1] and \
+                        index2[0] == short[index1 + 1]:
+                    self.graph.add_edge(index2[0], index2[1], distance=index2[2])
 
     # Модификация остановок
     def modify_checkpoints(self, nodes: list):
@@ -93,36 +117,11 @@ class BusGraph:
         checkpoint['lon'] = lng
         self.graph.add_node(id, checkpoint=checkpoint)
 
-        for node in self.modified_checkpoints + self.neighbors:
-            distance = get_dist((checkpoint, self.graph.nodes[node]['checkpoint']))
-            self.graph.add_edge(id, node, distance=distance)
+        # for node in self.modified_checkpoints + self.neighbors:  # зачем просчитывать расстояния тут?
+        #     distance = get_dist((checkpoint, self.graph.nodes[node]['checkpoint']))
+        #     self.graph.add_edge(id, node, distance=distance)
         self.modified_checkpoints.append(id)
         return checkpoint
-
-    def get_optimised_route(self, node_a: list, node_b: list, nodes: list):
-        all_nodes = list()
-        all_nodes.append(node_a)
-        all_nodes = all_nodes + nodes
-        all_nodes.append(node_b)
-        e = list()
-        for id1, a in enumerate(all_nodes):
-            for id2, b in enumerate(all_nodes):
-                if id2 <= id1:
-                    continue
-                e.append((a['id'], b['id'], get_dist((a, b))))
-        G = nx.Graph()
-        G.add_weighted_edges_from(e)
-        short = nx.dijkstra_path(G, node_a['id'], node_b['id'])
-        bad_nodes = list()
-        for x in all_nodes:
-            b = False
-            for y in short:
-                if x['id'] == y:
-                    b = True
-                    continue
-            if not b:
-                bad_nodes.append(x)
-        return bad_nodes
 
     def get_ordered_checkpoints(self):
         nodes = list(nx.dfs_preorder_nodes(self.graph, self.direct))
