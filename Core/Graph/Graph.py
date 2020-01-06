@@ -89,6 +89,12 @@ class BusGraph:
                         index2[0] == short[index1 + 1]:
                     self.graph.add_edge(index2[0], index2[1], distance=index2[2])
 
+        for node, edge in enumerate(short):
+            if short[node] in self.modified_checkpoints: self.modified_checkpoints.remove(short[node])
+        for x in self.modified_checkpoints:
+            self.graph.remove_node(x)
+        self.modified_checkpoints.clear()
+
     # Модификация остановок
     def modify_checkpoints(self, nodes: list):
         self.modified_checkpoints += nodes

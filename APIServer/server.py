@@ -52,6 +52,5 @@ def remove_checkpoints():
 
 @app.route('/optimizeCheckpoint', methods=['GET'])
 def optimize_checkpoints():
-    # graph.modified_checkpoints.clear() # это вообще зачем здесь?
     graph.optimize()
     return '', 204
