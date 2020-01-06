@@ -1,6 +1,7 @@
 import requests
 from Core.DataLoaders.Maps import distance_finder
 
+
 def get_routes():
     routes = requests.get('https://api.tgt72.ru/api/v5/route/').json()
     routes = routes['objects']
@@ -36,4 +37,4 @@ def get_dist(pair):
     distance = distance_finder(first['lat'], first['lon'], second['lat'], second['lon'])
     dist['distance'] = distance['dist']
     dist['time'] = distance['time']
-    return dist
+    return distance['dist']

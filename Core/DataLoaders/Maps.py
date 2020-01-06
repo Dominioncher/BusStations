@@ -5,7 +5,7 @@ def distance_finder(lat1, lng1, lat2, lng2):
     maps_key = 'AIzaSyA2XatPXMVT8Z_s7ZabHNFjw9xYcShWuh4'
     base_url = 'https://maps.googleapis.com/maps/api/distancematrix/json'
     url = base_url + '?' + 'origins=' + str(lat1) + '%2C' + str(lng1) + '&destinations=' + str(lat2) + '%2C' \
-        + str(lng2) + '&key=' + maps_key
+          + str(lng2) + '&key=' + maps_key
 
     response = requests.get(url).json()
     res = response['rows'][0]['elements'][0]
